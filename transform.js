@@ -5,7 +5,7 @@ function getFunctionCode(func, name, shorthand) {
     if (isArrow) {
         return `${asyncStr}${generatorStr}${paramsStr} => ${body}`;
     }
-    const code = `${asnycStr}${name || ''}${paramsStr} ${body}`;
+    const code = `${asnycStr}${generatorStr}${name || ''}${paramsStr} ${body}`;
     return shorthand ? code : `function ${code}`;
 }
 
