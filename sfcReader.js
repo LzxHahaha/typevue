@@ -56,8 +56,11 @@ function getCode(filePath) {
 module.exports = function(filePath, className, config) {
     const { template, script, styles } = getCode(filePath);
     try {
-        const struct = resolver(script);
-        const code = transform(className, struct, config);
+        let code = script;
+        if (code) {
+            const struct = resolver(code);
+            code = transform(className, struct, config);
+        }
         return {
             template,
             script: code,

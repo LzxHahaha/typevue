@@ -5,7 +5,7 @@ function getFunctionCode(func, name, shorthand) {
     if (isArrow) {
         return `${asyncStr}${generatorStr}${paramsStr} => ${body}`;
     }
-    const code = `${name || ''}${paramsStr} ${body}`;
+    const code = `${asnycStr}${name || ''}${paramsStr} ${body}`;
     return shorthand ? code : `function ${code}`;
 }
 
@@ -243,7 +243,7 @@ module.exports = function (className, struct, options = {}) {
     const decorators = ['Component'];
     const hasMixin = !!mixins.length;
     Object.entries({
-        Prop: !!props,
+        Prop: !!props.length,
         Watch: !!Object.keys(watchers).length,
         Mixin: hasMixin,
     }).forEach(([key, value]) => {

@@ -125,11 +125,11 @@ const defineVisitor = {
             let vars = [];
             nodePath.node.body.body.forEach((node) => {
                 if (t.isReturnStatement(node)) {
-                    const varReg = new RegExp(vars.join('|'));
+                    const varReg = vars.length ? new RegExp(vars.join('|')) : null;
                     node.argument.properties.forEach((el) => {
                         const name = el.key.name;
                         const value = state.code.substring(el.value.start, el.value.end);
-                        const lazy = varReg.test(value);
+                        const lazy = varReg ? varReg.test(value) : false;
                         state.data.push({
                             name,
                             value,
