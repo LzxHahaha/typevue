@@ -1,13 +1,17 @@
+#!/usr/bin/env node
+
 const commander = require('commander');
 const path = require('path');
 const fs = require('fs');
 const prettier = require('prettier');
 
+const packageJson = require('./package.json');
+
 const sfcReader = require('./sfcReader');
 const resolver = require('./resolver');
 const transform = require('./transform');
 
-commander.version('0.0.1');
+commander.version(packageJson.version);
 commander
     .option('-d, --dir <dir>', 'Specify input directory.')
     .option('-o, --output <dir>', 'Specify output directory.')

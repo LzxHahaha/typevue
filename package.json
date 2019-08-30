@@ -1,12 +1,13 @@
 {
-  "name": "vuets",
-  "version": "1.0.0",
+  "name": "typevue",
+  "version": "1.0.2",
   "description": "",
   "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+  "scripts": {},
+  "bin": {
+    "typevue": "./cli.js"
   },
-  "author": "",
+  "author": "LzxHahaha",
   "license": "ISC",
   "dependencies": {
     "antlr4": "^4.7.2",
@@ -15,5 +16,9 @@
     "babylon": "^6.18.0",
     "commander": "^3.0.0",
     "prettier": "^1.18.2"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/LzxHahaha/typevue"
   }
 }
