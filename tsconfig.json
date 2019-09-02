@@ -1,0 +1,24 @@
+{
+  "compilerOptions": {
+    "target": "es5",
+    "module": "commonjs",
+    "lib": [
+      "dom",
+      "es2017"
+    ],
+    "allowJs": true,
+    "sourceMap": true,
+    "outDir": "./dist",
+    "rootDirs": ["bin", "src"],
+    "strict": true,
+    "esModuleInterop": true,
+    "resolveJsonModule": true
+  },
+  "exclude": [
+    ".vscode",
+    "dist",
+    "node_modules",
+    "test",
+    "output"
+  ]
+}

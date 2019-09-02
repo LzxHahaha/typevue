@@ -1,15 +1,15 @@
 #!/usr/bin/env node
 
-const commander = require('commander');
-const path = require('path');
-const fs = require('fs');
-const prettier = require('prettier');
+import commander from 'commander';
+import path from 'path';
+import fs from 'fs';
+import prettier from 'prettier';
 
-const packageJson = require('./package.json');
+const packageJson = require('../../package.json');
 
-const sfcReader = require('./sfcReader');
-const resolver = require('./resolver');
-const transform = require('./transform');
+import SfcReader from '../src/SfcReader';
+import SfcStruct from '../src/sfcStruct';
+import transform from '../src/Transform';
 
 commander.version(packageJson.version);
 commander
@@ -48,7 +48,7 @@ if (config) {
     Object.assign(cliConfig, require(path.resolve(cwd, config)));
 }
 
-function mkdir(dirPath) {
+function mkdir(dirPath: string) {
     if (!fs.existsSync(dirPath)) {
         fs.mkdirSync(dirPath, { recursive: true });
     }
@@ -60,7 +60,7 @@ if (!fs.existsSync(inputPath)) {
 }
 mkdir(outputPath);
 
-function formatter(code) {
+function formatter(code: string) {
     return prettier.format(code, {
         parser: 'typescript'
     });
@@ -70,7 +70,7 @@ const { cssType, jsPathReg } = cliConfig;
 const vueReg = /\.vue$/, fileNameReg = /^[^.]+/, mixinReg = new RegExp(jsPathReg);
 
 let count = 0;
-function convertDir(dirPath, outputPath) {
+function convertDir(dirPath: string, outputPath: string) {
     const files = fs.readdirSync(dirPath);
     for (const file of files) {
         const filePath = path.join(dirPath, file);
@@ -89,10 +89,10 @@ function convertDir(dirPath, outputPath) {
             continue;
         }
 
-        const fileName = file.match(fileNameReg)[0];
+        const fileName = (file.match(fileNameReg) as RegExpMatchArray)[0];
         const className = fileName[0].toUpperCase() + fileName.substring(1);
         if (isVue) {
-            const { template, script, styles } = sfcReader(filePath, className, cliConfig);
+            const { template, script, styles } = SfcReader(filePath, className, cliConfig);
             const tags = [template];
 
             if (script) {
@@ -112,7 +112,7 @@ function convertDir(dirPath, outputPath) {
             fs.writeFileSync(path.join(outputPath, file), tags.join('\n') + '\n');
         } else {
             const code = fs.readFileSync(filePath).toString();
-            const struct = resolver(code);
+            const struct = new SfcStruct(code);
             const res = transform(`${className}Mixin`, struct, config);
             fs.writeFileSync(path.join(outputPath, `${fileName}.ts`), formatter(res));
         }

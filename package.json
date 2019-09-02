@@ -1,11 +1,14 @@
 {
   "name": "typevue",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "",
   "main": "index.js",
-  "scripts": {},
+  "scripts": {
+    "build": "tsc",
+    "prepublish": "tsc"
+  },
   "bin": {
-    "typevue": "./cli.js"
+    "typevue": "./dist/bin/cli.js"
   },
   "author": "LzxHahaha",
   "license": "ISC",
@@ -20,5 +23,14 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/LzxHahaha/typevue"
+  },
+  "devDependencies": {
+    "@types/antlr4": "^4.7.0",
+    "@types/babel-traverse": "^6.25.5",
+    "@types/babel-types": "^7.0.7",
+    "@types/babylon": "^6.16.5",
+    "@types/node": "^12.7.3",
+    "@types/prettier": "^1.18.2",
+    "typescript": "^3.6.2"
   }
 }

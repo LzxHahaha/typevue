@@ -45,7 +45,6 @@ Config file should be a `json` file or a `js` with `module.exports = { ... }`;
 
 ## TODO
 
-* rewrite with TypeScript;
 * provide/inject support;
 * replace `substring`;
 * generate code from AST;

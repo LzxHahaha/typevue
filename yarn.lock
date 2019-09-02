@@ -2,6 +2,40 @@
 # yarn lockfile v1
 
 
+"@types/antlr4@^4.7.0":
+  version "4.7.0"
+  resolved "https://registry.npmjs.org/@types/antlr4/-/antlr4-4.7.0.tgz#e6300119bddff6e23f5bbd299f5cf3c722a6249b"
+  integrity sha512-WdyHH4PHxBQkeWoRTbuC/dvf0QErJpJE4UpESQSRmKoMER15DCLFHAHQjkwevMKQie0kqawS/eTY563GGMbz/g==
+
+"@types/babel-traverse@^6.25.5":
+  version "6.25.5"
+  resolved "https://registry.npmjs.org/@types/babel-traverse/-/babel-traverse-6.25.5.tgz#6d293cf7523e48b524faa7b86dc3c488191484e5"
+  integrity sha512-WrMbwmu+MWf8FiUMbmVOGkc7bHPzndUafn1CivMaBHthBBoo0VNIcYk1KV71UovYguhsNOwf3UF5oRmkkGOU3w==
+  dependencies:
+    "@types/babel-types" "*"
+
+"@types/babel-types@*", "@types/babel-types@^7.0.7":
+  version "7.0.7"
+  resolved "https://registry.npmjs.org/@types/babel-types/-/babel-types-7.0.7.tgz#667eb1640e8039436028055737d2b9986ee336e3"
+  integrity sha512-dBtBbrc+qTHy1WdfHYjBwRln4+LWqASWakLHsWHR2NWHIFkv4W3O070IGoGLEBrJBvct3r0L1BUPuvURi7kYUQ==
+
+"@types/babylon@^6.16.5":
+  version "6.16.5"
+  resolved "https://registry.npmjs.org/@types/babylon/-/babylon-6.16.5.tgz#1c5641db69eb8cdf378edd25b4be7754beeb48b4"
+  integrity sha512-xH2e58elpj1X4ynnKp9qSnWlsRTIs6n3tgLGNfwAGHwePw0mulHQllV34n0T25uYSu1k0hRKkWXF890B1yS47w==
+  dependencies:
+    "@types/babel-types" "*"
+
+"@types/node@^12.7.3":
+  version "12.7.3"
+  resolved "https://registry.npmjs.org/@types/node/-/node-12.7.3.tgz#27b3f40addaf2f580459fdb405222685542f907a"
+  integrity sha512-3SiLAIBkDWDg6vFo0+5YJyHPWU9uwu40Qe+v+0MH8wRKYBimHvvAOyk3EzMrD/TrIlLYfXrqDqrg913PynrMJQ==
+
+"@types/prettier@^1.18.2":
+  version "1.18.2"
+  resolved "https://registry.npmjs.org/@types/prettier/-/prettier-1.18.2.tgz#069e7d132024d436fd1f5771f6932426a695f230"
+  integrity sha512-2JBasa5Qaj81Qsp/dxX2Njy+MdKC767WytHUDsRM7TYEfQvKPxsnGpnCBlBS1i2Aiv1YwCpmKSbQ6O6v8TpiKg==
+
 ansi-regex@^2.0.0:
   version "2.1.1"
   resolved "http://rnpm.hz.netease.com/ansi-regex/download/ansi-regex-2.1.1.tgz#c3b33ab5ee360d86e0e628f0468ae7ef27d654df"
@@ -58,7 +92,7 @@ babel-traverse@^6.26.0:
 
 babel-types@^6.26.0:
   version "6.26.0"
-  resolved "http://rnpm.hz.netease.com/babel-types/download/babel-types-6.26.0.tgz#a3b073f94ab49eb6fa55cd65227a334380632497"
+  resolved "https://registry.npmjs.org/babel-types/-/babel-types-6.26.0.tgz#a3b073f94ab49eb6fa55cd65227a334380632497"
   integrity sha1-o7Bz+Uq0nrb6Vc1lInozQ4BjJJc=
   dependencies:
     babel-runtime "^6.26.0"
@@ -181,3 +215,8 @@ to-fast-properties@^1.0.3:
   version "1.0.3"
   resolved "http://rnpm.hz.netease.com/to-fast-properties/download/to-fast-properties-1.0.3.tgz#b83571fa4d8c25b82e231b06e3a3055de4ca1a47"
   integrity sha1-uDVx+k2MJbguIxsG46MFXeTKGkc=
+
+typescript@^3.6.2:
+  version "3.6.2"
+  resolved "https://registry.npmjs.org/typescript/-/typescript-3.6.2.tgz#105b0f1934119dde543ac8eb71af3a91009efe54"
+  integrity sha512-lmQ4L+J6mnu3xweP8+rOrUwzmN+MRAj7TgtJtDaXE5PMyX2kCrklhg3rvOsOIfNeAWMQWO2F1GPc1kMD2vLAfw==

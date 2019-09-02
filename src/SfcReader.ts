@@ -1,11 +1,11 @@
-const fs = require('fs');
-const antlr4 = require('antlr4');
-const { sfcLexer } = require('./lib/sfcLexer');
-const { sfcParser } = require('./lib/sfcParser');
-const { sfcParserListener } = require('./lib/sfcParserListener');
+import fs from 'fs';
+import antlr4 from 'antlr4';
+import { sfcLexer } from './lib/sfcLexer';
+import { sfcParser } from './lib/sfcParser';
+import { sfcParserListener } from './lib/sfcParserListener';
 
-const resolver = require('./resolver');
-const transform = require('./transform');
+import SfcStruct from './SfcStruct';
+import transform from './Transform';
 
 function removeTag(code = '') {
     if (!code) {
@@ -22,18 +22,24 @@ function removeTag(code = '') {
     return code.substring(i + 1, j).trim();
 }
 
-function getCode(filePath) {
+function getCode(filePath: string) {
     const code = fs.readFileSync(filePath).toString();
     const stream = new antlr4.InputStream(code);
     const lexer = new sfcLexer(stream);
+    // @ts-ignore
     const tokens = new antlr4.CommonTokenStream(lexer);
     const parser = new sfcParser(tokens);
+    // @ts-ignore
     parser.buildParseTrees = true;
 
     const tree = parser.sfcFile();
     const listener = new sfcParserListener();
 
-    let template = '', script = '', styles = [];
+    let template = '', script = '';
+    const styles: {
+        code: string,
+        isScoped: boolean
+    }[] = [];
 
     listener.enterTemplate = function(ctx) {
         template = ctx.getText().trim();
@@ -49,24 +55,21 @@ function getCode(filePath) {
         });
     }
 
+    // @ts-ignore
     antlr4.tree.ParseTreeWalker.DEFAULT.walk(listener, tree);
     return { template, script, styles };
 }
 
-module.exports = function(filePath, className, config) {
+export default function(filePath: string, className: string, config: any) {
     const { template, script, styles } = getCode(filePath);
-    try {
-        let code = script;
-        if (code) {
-            const struct = resolver(code);
-            code = transform(className, struct, config);
-        }
-        return {
-            template,
-            script: code,
-            styles
-        }
-    } catch (e) {
-        console.error(e);
+    let code = script;
+    if (code) {
+        const struct = new SfcStruct(code);
+        code = transform(className, struct, config);
     }
+    return {
+        template,
+        script: code,
+        styles
+    };
 }
