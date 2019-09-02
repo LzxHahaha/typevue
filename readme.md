@@ -19,6 +19,7 @@ Config file should be a `json` file or a `js` with `module.exports = { ... }`;
 // config schema
 {
     "cssType": "css",
+    "jsPathReg": "mixin",
     "importMap": {
         "ListMixin": {
             "oldPathReg": "@/common(/index)?",
@@ -36,9 +37,11 @@ Config file should be a `json` file or a `js` with `module.exports = { ... }`;
 }
 ```
 
-`cssType` use to specify the css language, default is `css`;
+`cssType` is used to specify the css language, default is `css`;
 
-`importMap` use to change moudules import path, the `oldPath` property has high priority then `oldPathReg`;
+`jsPathReg` is used to set which path the js file will be transform;
+
+`importMap` is used to change moudules import path, the `oldPath` property has high priority then `oldPathReg`;
 
 ## TODO
 

@@ -36,13 +36,16 @@ const cwd = process.cwd();
 const inputPath = path.resolve(cwd, dir);
 const outputPath = path.resolve(cwd, output);
 
-let cliConfig = {};
+let cliConfig = {
+    cssType: 'css',
+    jsPathReg: 'mixin'
+};
 if (config) {
     if (!/\.js(on)?$/.test(config)) {
         console.error('Config file should be a .js or .json file');
         process.exit(0);
     }
-    cliConfig = require(path.resolve(cwd, config));
+    Object.assign(cliConfig, require(path.resolve(cwd, config)));
 }
 
 function mkdir(dirPath) {
@@ -63,8 +66,8 @@ function formatter(code) {
     });
 }
 
-const vueReg = /\.vue$/, fileNameReg = /^[^.]+/, mixinReg = /mixin/;
-const { cssType = 'css' } = cliConfig;
+const { cssType, jsPathReg } = cliConfig;
+const vueReg = /\.vue$/, fileNameReg = /^[^.]+/, mixinReg = new RegExp(jsPathReg);
 
 let count = 0;
 function convertDir(dirPath, outputPath) {
