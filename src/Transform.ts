@@ -1,6 +1,6 @@
 import SfcStruct, {
     FunctionDefine, ImportType
-} from './sfcStruct';
+} from './SfcStruct';
 
 export interface ImportMap {
     [key: string]: {
@@ -15,10 +15,15 @@ export interface TransformOptions {
 }
 
 export class Transform {
+    public className = '';
     public importMap: ImportMap = {};
     private code: string[] = [];
 
-    constructor(public className: string, public struct: SfcStruct, options: TransformOptions = {}) {
+    constructor(className: string, public struct: SfcStruct, options: TransformOptions = {}) {
+        if (/^[0-9]/.test(className)) {
+            className = `_${className}`;
+        }
+        this.className = className;
         this.importMap = options.importMap || {};
     }
 
@@ -37,7 +42,7 @@ export class Transform {
         Object.entries({
             Prop: !!props.length,
             Watch: !!Object.keys(watchers).length,
-            Mixin: hasMixin,
+            Mixins: hasMixin,
         }).forEach(([key, value]) => {
             if (value) {
                 decorators.push(key);
@@ -59,7 +64,7 @@ export class Transform {
         // mixins
         let extend = 'Vue';
         if (hasMixin) {
-            extend = `Mixin(${mixins.join(', ')})`;
+            extend = `Mixins(${mixins.join(', ')})`;
         }
         this.addCode(`export default class ${this.className} extends ${extend} {`);
 
@@ -183,7 +188,7 @@ export class Transform {
         let res = '@Component'
         let componentOpts = [];
         if (components.length) {
-            componentOpts.push(`components: { ${components.join(',')} }`);
+            componentOpts.push(`component: { ${components.join(',')} }`);
         }
         if (directives) {
             componentOpts.push(`directives: ${directives}`);
@@ -286,12 +291,15 @@ export class Transform {
                     func = func.handler;
                 } else {
                     func = handler;
-                    handlerName = `${propName}WatchHandler${count || ''}`.replace(/[^\w\d_$]/g, '_');
+                    handlerName = `${propName}WatchHandler${count || ''}`.replace(/[^a-zA-Z0-9_$]/g, '_');
                     count += 1;
                 }
                 if (!func) {
                     console.error(`Watcher ${propName}'s handler define was not found`);
                     return;
+                }
+                if (/^[0-9]/.test(handlerName)) {
+                    handlerName = '_' + handlerName;
                 }
                 let optStr = '';
                 if (options) {

@@ -48,11 +48,15 @@ function getCode(filePath: string) {
         script = removeTag(ctx.getText().trim());
     }
     listener.enterStyle = function(ctx) {
-        const code = ctx.getText().trim();
-        styles.push({
-            code: removeTag(code),
-            isScoped: /<style[^>]*scoped[^>]*>/.test(code)
-        });
+        const text = ctx.getText().trim();
+        const isScoped = /<style[^>]*scoped[^>]*>/.test(text);
+        const code = removeTag(text);
+        if (code) {
+            styles.push({
+                code,
+                isScoped
+            });
+        }
     }
 
     // @ts-ignore

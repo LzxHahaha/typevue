@@ -8,7 +8,7 @@ import prettier from 'prettier';
 const packageJson = require('../../package.json');
 
 import SfcReader from '../src/SfcReader';
-import SfcStruct from '../src/sfcStruct';
+import SfcStruct from '../src/SfcStruct';
 import transform from '../src/Transform';
 
 commander.version(packageJson.version);

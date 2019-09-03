@@ -84,6 +84,9 @@ export default class SfcStruct {
     constructor(public code: string) {
         const ast = babylon.parse(code, {
             sourceType: 'module',
+            plugins: [
+                'objectRestSpread',
+            ]
         });
         traverse(ast, fileVisitor, undefined, this);
     }
@@ -96,6 +99,23 @@ export default class SfcStruct {
         if (!this.watchers[key]) {
             this.watchers[key] = [];
         }
+    }
+    
+    public getFunctionDefine(
+        node: t.ArrowFunctionExpression | t.FunctionExpression | t.ObjectMethod,
+        clearBreak: boolean = false
+    ): FunctionDefine {
+        let body = this.getSourceCode(node.body).trim();
+        if (clearBreak) {
+            body = body.replace(/\n */g, ' ');
+        }
+        return {
+            params: node.params.map(param => this.getSourceCode(param)),
+            body,
+            isArrow: t.isArrowFunctionExpression(node),
+            async: node.async,
+            generator: node.generator
+        };
     }
 }
 
@@ -261,7 +281,7 @@ const propsVisitor = {
                         const { value } = el;
                         if (t.isArrowFunctionExpression(value) || t.isFunctionExpression(value)) {
                             // `default: () => ...` or `default: function() { ... }`
-                            prop.default = getFunctionDefine(value, state, true);
+                            prop.default = state.getFunctionDefine(value, true);
                         } else if (t.isIdentifier(value)) {
                             prop[key] = value.name;
                         } else {
@@ -269,7 +289,7 @@ const propsVisitor = {
                         }
                     } else if (t.isObjectMethod(el)) {
                         // `default() { ... }`
-                        prop.default = getFunctionDefine(el, state, true);
+                        prop.default = state.getFunctionDefine(el, true);
                     }
                 }
             });
@@ -292,7 +312,7 @@ const computedVisitor = {
         const computedName = (node.key as t.Identifier).name;
         if (t.isFunctionExpression(node.value)) {
             state.computed[computedName] = {
-                get: getFunctionDefine(node.value, state)
+                get: state.getFunctionDefine(node.value)
             };
         } else {
             state.computed[computedName] = {};
@@ -307,9 +327,9 @@ const computedVisitor = {
                     const method = (key as t.Identifier).name;
                     if (method === 'get' || method === 'set') {
                         if (t.isObjectProperty(el)) {
-                            state.computed[computedName][method] = getFunctionDefine(value, state);
+                            state.computed[computedName][method] = state.getFunctionDefine(value);
                         } else if (t.isObjectMethod(el)) {
-                            state.computed[computedName][method] = getFunctionDefine(el, state);
+                            state.computed[computedName][method] = state.getFunctionDefine(el);
                         }
                     }
                 }
@@ -321,7 +341,7 @@ const computedVisitor = {
         const { node } = nodePath;
         const key = (node.key as t.Identifier).name;
         state.computed[key] = {
-            get: getFunctionDefine(node, state)
+            get: state.getFunctionDefine(node)
         };
         nodePath.skip();
     },
@@ -337,7 +357,7 @@ const watchVisitor = {
         const watcherName = (node.key as t.Identifier).name;
         state.initWatcher(watcherName);
         state.watchers[watcherName].push({
-            handler: getFunctionDefine(node, state)
+            handler: state.getFunctionDefine(node)
         });
         nodePath.skip();
     },
@@ -349,7 +369,7 @@ const watchDefineVisitor = {
         const key = getWatcherDefindKey(nodePath);
         state.initWatcher(key);
         state.watchers[key].push({
-            handler: getFunctionDefine(node, state)
+            handler: state.getFunctionDefine(node)
         });
 
         nodePath.skip();
@@ -376,7 +396,7 @@ const watchDefineVisitor = {
             const name = (el.key as t.Identifier).name;
                 if (name === 'handler') {
                     if (t.isFunctionExpression(el.value)) {
-                        watcher.handler = getFunctionDefine(el.value, state);
+                        watcher.handler = state.getFunctionDefine(el.value);
                     } else if (t.isStringLiteral(el.value)) {
                         watcher.handlerName = el.value.value;
                     } else {
@@ -405,7 +425,7 @@ const methodsVisitor = {
         if (t.isArrowFunctionExpression(value) || t.isFunctionExpression(value)) {
             state.methods.push({
                 name,
-                handler: getFunctionDefine(value, state)
+                handler: state.getFunctionDefine(value)
             });
         } else {
             state.methods.push({
@@ -418,7 +438,7 @@ const methodsVisitor = {
     ObjectMethod(nodePath: NodePath<t.ObjectMethod>, state: SfcStruct) {
         state.methods.push({
             name: (nodePath.node.key as t.Identifier).name,
-            handler: getFunctionDefine(nodePath.node, state)
+            handler: state.getFunctionDefine(nodePath.node)
         });
         nodePath.skip();
     },
@@ -452,24 +472,6 @@ function getWatcherDefindKey(nodePath: NodePath<t.FunctionExpression> | NodePath
         unknownError('wather define', '', nodePath.node.loc.start, true);
     }
     return key;
-}
-
-function getFunctionDefine(
-    node: t.ArrowFunctionExpression | t.FunctionExpression | t.ObjectMethod,
-    state: SfcStruct,
-    clearBreak: boolean = false
-): FunctionDefine {
-    let body = state.getSourceCode(node.body).trim();
-    if (clearBreak) {
-        body = body.replace(/\n */g, ' ');
-    }
-    return {
-        params: node.params.map(param => (param as t.Identifier).name),
-        body,
-        isArrow: t.isArrowFunctionExpression(node),
-        async: node.async,
-        generator: node.generator
-    };
 }
 
 function unknownError(type: string, name: string, loc: { line: number, column: number }, throwError = false) {

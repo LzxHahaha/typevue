@@ -2,7 +2,7 @@ lexer grammar sfcLexer;
 
 TEMPLATE: TEMPLATE_OPEN (TEMPLATE|.)*? TEMPLATE_CLOSE;
 
-fragment TEMPLATE_OPEN: '<template>';
+fragment TEMPLATE_OPEN: '<template';
 fragment TEMPLATE_CLOSE: '</template>';
 
 SCRIPT: SCRIPT_OPEN .*? SCRIPT_CLOSE;
