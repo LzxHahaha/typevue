@@ -29,6 +29,7 @@ export class Transform {
 
     public exec() {
         const {
+            isVueComponent,
             globals,
             mixins,
             props,
@@ -53,10 +54,18 @@ export class Transform {
         }
 
         // import
-        this.addCode(`import { ${decorators.join(', ')} } from 'vue-property-decorator';\n` + this.getImports());
+        const imports = this.getImports();
+        if (isVueComponent) {
+            this.addCode(`import { ${decorators.join(', ')} } from 'vue-property-decorator';\n` + imports);
+        } else {
+            this.addCode(imports);
+        }
 
         // globals
         this.addCode(globals.join('\n'), true);
+        if (!isVueComponent) {
+            return this.code.join('\n');
+        }
 
         // @Component({components, directives, filters})
         this.addCode(this.getAtComponent());

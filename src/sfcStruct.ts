@@ -65,6 +65,7 @@ export interface MethodDefine {
 }
 
 export default class SfcStruct {
+    public isVueComponent = false;
     public globals: string[] = [];
     public directImport: string[] = [];
     public imports: ImportDefines = {};
@@ -168,6 +169,11 @@ const fileVisitor =  {
         state.globals.push(state.getSourceCode(nodePath.node));
     },
     ExportDefaultDeclaration(nodePath: NodePath<t.ExportDefaultDeclaration>, state: SfcStruct) {
+        if (!t.isObjectExpression(nodePath.node.declaration)) {
+            state.globals.push(state.getSourceCode(nodePath.node));
+            return;
+        }
+        state.isVueComponent = true;
         nodePath.traverse(defineVisitor, state);
         nodePath.stop();
     }
