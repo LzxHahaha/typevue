@@ -135,6 +135,14 @@ const hooksNames = new Set([
 ]);
 
 const fileVisitor =  {
+    Program(nodePath: NodePath<t.Program>, state: SfcStruct) {
+        nodePath.node.body.forEach((node) => {
+            if (t.isImportDeclaration(node) || t.isExportDefaultDeclaration(node)) {
+                return;
+            }
+            state.globals.push(state.getSourceCode(node));
+        });
+    },
     ImportDeclaration(nodePath: NodePath<t.ImportDeclaration>, state: SfcStruct) {
         const source = nodePath.node.source.value;
         if (!nodePath.node.specifiers.length) {
@@ -161,12 +169,6 @@ const fileVisitor =  {
                 sourceName
             };
         });
-    },
-    VariableDeclaration(nodePath: NodePath<t.VariableDeclaration>, state: SfcStruct) {
-        state.globals.push(state.getSourceCode(nodePath.node));
-    },
-    ExpressionStatement(nodePath: NodePath<t.ExpressionStatement>, state: SfcStruct) {
-        state.globals.push(state.getSourceCode(nodePath.node));
     },
     ExportDefaultDeclaration(nodePath: NodePath<t.ExportDefaultDeclaration>, state: SfcStruct) {
         if (!t.isObjectExpression(nodePath.node.declaration)) {
@@ -221,15 +223,43 @@ const defineVisitor = {
         const name = (key as t.Identifier).name;
         if (name === 'data') {
             let vars: string[] = [];
-            nodePath.node.body.body.forEach((node) => {
-                if (t.isReturnStatement(node)) {
-                    const varReg = vars.length ? new RegExp(vars.join('|')) : null;
-                    const args = node.argument as t.ObjectExpression;
-                    args.properties.forEach((el) => {
+            const body = nodePath.get('body').get('body');
+            body.forEach((p) => {
+                if (t.isReturnStatement(p.node)) {
+                    const varSet = new Set(vars);
+                    const args = p.get('argument');
+                    const dataObj = (Array.isArray(args) ? args[args.length - 1] : args) as NodePath<t.ObjectExpression>;
+                    
+                    const props = dataObj.get('properties');
+                    props.forEach((el) => {
+                        if (!t.isObjectProperty(el.node)) {
+                            return;
+                        }
+                        const name = (el.node.key as t.Identifier).name;
+                        const valueStr = state.getSourceCode(el.node.value);
+
+                        const value = el.get('value');
+                        const valNode = (Array.isArray(value) ? value[value.length - 1] : value);
+
+                        const idState = {
+                            lazy: false,
+                            varSet
+                        };
+                        // TODO: visitor
+                        valNode.traverse({}, idState);
+
+                        state.data.push({
+                            name,
+                            value: valueStr,
+                            lazy: idState.lazy,
+                            type: getValueType(valueStr)
+                        });
+                    });
+                    dataObj.node.properties.forEach((el) => {
                         if (t.isObjectProperty(el)) {
                             const name = (el.key as t.Identifier).name;
                             const value = state.getSourceCode(el.value);
-                            const lazy = varReg ? varReg.test(value) : false;
+                            const lazy = varSet.has(name);
                             state.data.push({
                                 name,
                                 value,
@@ -239,10 +269,8 @@ const defineVisitor = {
                         }
                     });
                 } else {
-                    if (t.isVariableDeclaration(node)) {
-                        vars = vars.concat(node.declarations.map(el => (el.id as t.Identifier).name));
-                    }
-                    state.init.push(state.getSourceCode(node));
+                    state.init.push(state.getSourceCode(p.node));
+                    p.traverse(saveDataIdVisitor, vars);
                 }
             });
             
@@ -251,6 +279,21 @@ const defineVisitor = {
             state.hooks.push(state.getSourceCode(nodePath.node));
         } else {
             unknownError('method', name, loc.start);
+        }
+    }
+};
+
+const saveDataIdVisitor = {
+    VariableDeclarator(nodePath: NodePath<t.VariableDeclarator>, state: string[]) {
+        const id = nodePath.get('id');
+        if (t.isIdentifier(id.node)) {
+            state.push(id.node.name);
+        } else {
+            id.traverse({
+                Identifier(nodePath: NodePath<t.Identifier>, state: string[]) {
+                    state.push(nodePath.node.name);
+                }
+            }, state);
         }
     }
 };

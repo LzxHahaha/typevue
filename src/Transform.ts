@@ -197,7 +197,7 @@ export class Transform {
         let res = '@Component'
         let componentOpts = [];
         if (components.length) {
-            componentOpts.push(`component: { ${components.join(',')} }`);
+            componentOpts.push(`components: { ${components.join(',')} }`);
         }
         if (directives) {
             componentOpts.push(`directives: ${directives}`);
